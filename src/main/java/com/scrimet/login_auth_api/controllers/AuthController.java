@@ -29,11 +29,14 @@ public class AuthController {
         String token = this.tokenService.generateToken(user);
         return ResponseEntity.ok(new ResponseDTO(user.getName(), token));
     }
-    return ResponseEntity.ok().body(user);
+    return ResponseEntity.badRequest().build();
     }
+
+
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterRequestDTO body) {
        Optional <User> user = this.repository.findByEmail(body.email());
+
         if(user.isEmpty()){
           User newUser = new User();
           newUser.setEmail(body.email());

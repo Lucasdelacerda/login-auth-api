@@ -1,4 +1,4 @@
-package com.scrimet.login_auth_api.infra.security.cors;
+package com.scrimet.login_auth_api.infra.cors;
 
 
 import org.springframework.context.annotation.Configuration;
