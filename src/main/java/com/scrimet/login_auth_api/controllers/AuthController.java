@@ -8,6 +8,7 @@ import com.scrimet.login_auth_api.infra.security.TokenService;
 import com.scrimet.login_auth_api.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +26,17 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity login(@Valid @RequestBody LoginRequestDTO body) {
-    User user = this.repository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
-    if(encoder.matches(body.password(), user.getPassword())){
-        String token = this.tokenService.generateToken(user);
-        return ResponseEntity.ok(new ResponseDTO(user.getName(), token));
+
+    Optional<User> user = repository.findByEmail(body.email());
+    if (user.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-    return ResponseEntity.badRequest().build();
+
+    if(encoder.matches(body.password(), user.get().getPassword())){
+        String token = tokenService.generateToken(user.get());
+        return ResponseEntity.ok(new ResponseDTO(user.get().getName(), token));
+    }
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
 
